@@ -1,0 +1,255 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model role {
+  id            Int         @id @default(autoincrement())
+  tag           String      @unique
+  description   String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+
+  Users         user[]
+  Permissions   permission[]
+}
+
+model permission {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+  tag           String      @unique
+  description   String?
+
+  Role          role[]
+}
+
+model user {
+  id            Int                      @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+  username      String                  @db.VarChar(255)  @unique
+  password      String                  @db.VarChar(255)
+  roleId        Int
+
+  Role          role        @relation(fields: [roleId], references: [id])
+  Files         uploaded_file[]
+  UserBalance   user_balance[]
+  Payments      payment[]
+  Student       student?
+  Teacher       teacher?
+  Payouts       payout[]
+}
+
+model student {
+    id                     Int                      @id @default(autoincrement())
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
+    deletedAt   DateTime?
+    email       String?  @db.VarChar(255)
+    first_name  String   @db.VarChar(255)
+    second_name String?  @db.VarChar(255)
+    last_name   String   @db.VarChar(255)
+    birthday    DateTime
+    phone       String   @db.VarChar(255)
+    address     String?  @db.VarChar(255)
+    comment     String?  @db.Text
+    genderId    Int
+    user_id     Int      @unique
+
+    User        user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+    Groups      group_student[]
+}
+
+model teacher {
+    id          Int                      @id @default(autoincrement())
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
+    deletedAt   DateTime?
+    email       String? @db.VarChar(255)
+    first_name  String  @db.VarChar(255)
+    second_name String? @db.VarChar(255)
+    last_name   String  @db.VarChar(255)
+    birthday    DateTime
+    phone       String   @db.VarChar(255)
+    address     String?  @db.VarChar(255)
+    comment     String?  @db.Text
+    genderId    Int
+    user_id     Int      @unique
+
+    User        user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+    Groups      group[]
+}
+
+model course {
+  id                     Int                      @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+  title                  String                  @db.VarChar(255)
+  description            String?     @db.Text
+  price                  Int
+  group                  group[]
+  uncategorized_students uncategorized_students[]
+}
+
+model group {
+  id                 Int               @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+  title              String           @db.VarChar(255)
+  teacher_id         Int
+  course_id          Int
+  closed             Boolean?
+  payment_percentage Int
+  monday             Boolean
+  tuesday            Boolean
+  wednesday          Boolean
+  thursday           Boolean
+  friday             Boolean
+  saturday           Boolean
+  time_start         String
+  time_end           String
+  starting_date      DateTime
+  expiration_date    DateTime
+
+  Course             course     @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Teacher            teacher    @relation(fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  Students           group_student[]
+  UserBalance        user_balance[]
+  Payments           payment[]
+}
+
+model uncategorized_students {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+  course_id     Int
+  discount      Int         @default(0)
+  comment       String
+
+  Course        course        @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model user_meta {
+  id         Int     @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+  user_id       Int
+  meta_key      String
+  meta_value String @db.VarChar(255)
+  //user       user?   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "idx_user_id")
+
+  @@index([user_id], map: "idx_user_id")
+}
+
+model group_student {
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+  user_id       Int
+  group_id      Int
+  joined_date   DateTime
+  certificate   Int?
+  status        Int
+  discount      Int       @default(0)
+
+  Group         group?    @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Student       student?     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+  Attendance    student_attendance[]
+}
+
+model student_attendance {
+  id                Int       @id @default(autoincrement())
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  deletedAt         DateTime?
+  group_student_id  Int
+  status            Boolean
+  date              String
+
+  student           group_student     @relation(fields: [group_student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model uploaded_file {
+  id              Int           @id @default(autoincrement())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
+  fieldname       String
+  originalname    String
+  encoding        String
+  mimetype        String
+  destination     String
+  filename        String        @unique
+  nameMini        String        @unique @default("")
+  path            String
+  size            Int
+  tag             String?        @default("file")
+  entity          String?
+  entity_id       Int?
+  user_id         Int
+  user            user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_id_4")
+
+  @@index([user_id], map: "idx_user_id_4")
+}
+
+model user_balance {
+  id              Int           @id @default(autoincrement())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
+  user_id         Int
+  amount          Int
+  comment         String
+  group_id        Int?
+  payment_id      Int?
+
+  user            user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  group           group?    @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  UserPayment     payment?    @relation(fields: [payment_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model payment {
+  id              Int           @id @default(autoincrement())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
+  user_id         Int
+  staff_id         Int
+  amount          Int
+  comment         String
+  group_id        Int
+
+  group           group    @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user            user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, name: "user")
+  Staff           user     @relation(fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: NoAction, name: "staff")
+  UserPayments    user_balance[]
+}
+
+model payout {
+  id              Int           @id @default(autoincrement())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
+  type_id         Int
+  amount          Int
+  comment         String
+  user_id         Int
+  staff_id         Int
+
+  User            user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, name: "user")
+  Staff           user     @relation(fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: NoAction, name: "staff")
+}

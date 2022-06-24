@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model role {
+  id            Int         @id @default(autoincrement())
+  tag           String      @unique
+  description   String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+
+  Users         user[]
+  Permissions   permission[]
+}
+
+model permission {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+  tag           String      @unique
+  description   String?
+
+  Role          role[]
+}
+
+model user {
+  id            Int                      @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+  username      String                  @db.VarChar(255)  @unique
+  password      String                  @db.VarChar(255)
+  roleId        Int
+  organization_id   Int
+
+  Role          role        @relation(fields: [roleId], references: [id])
+  UserBalance   user_balance[] @relation(name: "user_balance_user")
+  StaffUserBalances user_balance[]   @relation(name: "user_balance_staff")
+  Organization  organization @relation(fields: [organization_id], references: [id])
+}
+
+model user_balance {
+  id              Int           @id @default(autoincrement())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
+  user_id         Int
+  amount          Int
+  comment         String
+  group_id        Int?
+  payment_id      Int?
+  organization_id Int
+  staff_id        Int
+
+  user            user     @relation(fields: [user_id], references: [id], onDelete: Cascade, name: "user_balance_user")
+  Staff           user     @relation(fields: [staff_id], references: [id], onDelete: Cascade, name: "user_balance_staff")
+  Organization  organization @relation(fields: [organization_id], references: [id])
+}
+
+
+model tarif {
+  id                Int         @id @default(autoincrement())
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  deletedAt         DateTime?
+  title             String
+  price             Int
+  discount          Int
+  student_limit     Int
+  number_of_months  Int
+  isDemo            Boolean      @default(false)
+
+  Organizations     organization_tarif[]
+}
+
+model organization {
+  id              Int         @id @default(autoincrement())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
+  title           String
+  domain          String      @unique
+
+  Tarifs          organization_tarif[]
+
+  Users         user[]
+  UserBalances         	user_balance[]
+}
+
+model organization_tarif {
+  id              Int         @id @default(autoincrement())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
+  organization_id Int
+  tarif_id        Int
+  discount        Int
+  starting_date   DateTime    @default(now())
+  expiration_date DateTime
+
+  Organization    organization @relation(fields: [organization_id], references: [id])
+  Tarif           tarif @relation(fields: [tarif_id], references: [id])
+}
+
+
+model product {
+  id                Int         @id @default(autoincrement())
+
+  title             String
+  price             Float
+  description       String
+
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  deletedAt         DateTime?
+
+
+
+  product_count_id  Int
+  product_count     product_count @relation(fields: [product_count_id], references: [id])
+}
+
+model product_count {
+  id            Int         @id @default(autoincrement())
+  count         Int
+  price         Float
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+
+
+  Product       product[]
+}

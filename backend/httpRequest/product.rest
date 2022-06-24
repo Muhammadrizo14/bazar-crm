@@ -1,0 +1,35 @@
+### Find All product
+GET http://localhost:3000/product
+Content-Type: application/json
+
+
+### Create product
+POST http://localhost:3000/product
+Content-Type: application/json
+
+{
+  "title": "ayubkhan",
+  "price": 85,
+  "description": "ayubkhan khakimov",
+
+}
+
+
+### Find One product
+GET http://localhost:3000/product/1
+Content-Type: application/json
+
+
+### Update product
+PATCH http://localhost:3000/product/1
+Content-Type: application/json
+
+{
+  "title": "Carry"
+}
+
+
+
+### DELETE product
+DELETE http://localhost:3000/product/3
+
