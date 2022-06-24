@@ -11,6 +11,7 @@ import { ReportModule } from './report/report.module';
 import {AppController} from "./app.controller";
 import {AppService} from "./app.service";
 import { ProductModule } from './product/product.module';
+import { ProductCountModule } from './product-count/product-count.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ProductModule } from './product/product.module';
       UserBalanceModule,
       ReportModule,
       ProductModule,
+      ProductCountModule,
   ],
   controllers: [AppController],
   providers: [AppService],

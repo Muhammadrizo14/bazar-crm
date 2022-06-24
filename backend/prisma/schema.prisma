@@ -123,8 +123,7 @@ model product {
 
 
 
-  product_count_id  Int
-  product_count     product_count @relation(fields: [product_count_id], references: [id])
+  product_count       product_count[]
 }
 
 model product_count {
@@ -137,5 +136,6 @@ model product_count {
   deletedAt     DateTime?
 
 
-  Product       product[]
+  productId  Int
+  product_count     product @relation(fields: [product_id], references: [id])
 }

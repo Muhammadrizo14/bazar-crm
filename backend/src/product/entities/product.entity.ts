@@ -7,8 +7,6 @@ export class ProductEntity {
 
     description:string
 
-    product_count_id:number
-
     createdAt: Date
 
     updatedAt: Date

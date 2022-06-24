@@ -10,7 +10,7 @@ Content-Type: application/json
 {
   "title": "ayubkhan",
   "price": 85,
-  "description": "ayubkhan khakimov",
+  "description": "ayubkhan khakimov"
 
 }
 
@@ -25,7 +25,7 @@ PATCH http://localhost:3000/product/1
 Content-Type: application/json
 
 {
-  "title": "Carry"
+  "title": "Ochki"
 }
 
 
