@@ -1,0 +1,34 @@
+### Find All product
+GET http://localhost:3000/product-count
+Content-Type: application/json
+
+
+### Create product
+POST http://localhost:3000/product-count
+Content-Type: application/json
+
+{
+  "price": 85.00,
+  "count": 100,
+  "product_id": 1
+}
+
+
+### Find One product
+GET http://localhost:3000/product/1
+Content-Type: application/json
+
+
+### Update product
+PATCH http://localhost:3000/product/1
+Content-Type: application/json
+
+{
+  "title": "Carry"
+}
+
+
+
+### DELETE product
+DELETE http://localhost:3000/product/3
+
